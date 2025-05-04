@@ -4,7 +4,7 @@ const expenseSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, "El título del gasto es obligatorio"],
-    trim: true, // Elimina espacios innecesarios
+    trim: true,
   },
   amount: {
     type: Number,

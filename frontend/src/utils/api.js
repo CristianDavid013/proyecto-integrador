@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000";
+const API_URL = "http://localhost:5500";
 
 export async function apiFetch(endpoint, method = "GET", body = null, token = null) {
   const headers = { "Content-Type": "application/json" };

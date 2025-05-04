@@ -3,42 +3,78 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 const Category = require("../models/Category");
 
-// Crear una nueva categoría
 router.post("/", auth, async (req, res) => {
-  try {
-    const { name, description } = req.body;
+    try {
+        const {name} = req.body;
+        
+        if(!name){
+            return res.status(400).json({error: "El nombre de la categoria es obligatorio"})
+        }
 
-    if (!name) {
-      return res.status(400).json({ error: "El nombre de la categoría es obligatorio" });
+        const category = new Category({
+            name,
+            user: req.user.id,
+        });
+
+        await category.save();
+        res.status(201).json(category);
+    } catch (error) {
+        res.status(400).json({error: error.message});
     }
-
-    // Crear una nueva categoría y asignar el usuario autenticado
-    const category = new Category({
-      name,
-      description,
-      user: req.user.id, // Asignar el ID del usuario desde req.user
-    });
-
-    await category.save();
-    res.status(201).json({ message: "Categoría creada con éxito", category });
-  } catch (error) {
-    console.error("Error al crear la categoría:", error);
-    res.status(500).json({ error: "Error al crear la categoría" });
-  }
 });
 
-// Obtener las categorías del usuario autenticado
 router.get("/", auth, async (req, res) => {
-  try {
-    const categories = await Category.find({ user: req.user.id });
-    res.json(categories);
-  } catch (error) {
-    console.error("Error al obtener las categorías:", error);
-    res.status(500).json({ error: "Error al obtener las categorías" });
-  }
+    try {
+        const categories = await Category.find({user: req.user.id});
+        res.json(categories);
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({error: "Error al obtener las categorias"})
+    }
+});
+
+router.put("/:id", auth, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { name } = req.body;
+        
+        if (!name) {
+            return res.status(400).json({error: "El nombre de la categoría es obligatorio"});
+        }
+
+        const category = await Category.findOneAndUpdate(
+            { _id: id, user: req.user.id }, 
+            { name }, 
+            { new: true }
+        );
+
+        if (!category) {
+            return res.status(404).json({error: "Categoria no encontrada"});
+        }
+
+        res.json(category);
+    } catch (error) {
+        res.status(400).json({error: error.message});
+    }
+});
+
+router.delete("/:id", auth, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const category = await Category.findOneAndDelete({ 
+            _id: id, 
+            user: req.user.id 
+        });
+
+        if (!category) {
+            return res.status(404).json({error: "Categoria no encontrada"});
+        }
+
+        res.json({ message: "Categoría eliminada correctamente" });
+    } catch (error) {
+        res.status(500).json({error: "Error al eliminar la categoria"});
+    }
 });
 
 module.exports = router;
-
-
-// http://localhost:5000/categories/

@@ -29,4 +29,10 @@ const auth = (req, res, next) => {
     }
 };
 
+module.exports = (req, res, next) => {
+    // Validar token JWT u otra lógica...
+    next(); // Continuar si la autenticación es exitosa
+};
+
+
 module.exports = auth;

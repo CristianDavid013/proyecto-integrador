@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Categorías</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Categorías</h1>
+        <nav>
+            <button id="logoutButton">Cerrar Sesión</button>
+            <a href="expenses.html">Ir a Gastos</a>
+        </nav>
+        <form id="categoryForm">
+            <input type="text" id="categoryName" placeholder="Nombre de la categoría" required>
+            <button type="submit">Crear Categoría</button>
+        </form>
+        <div id="categoriesList"></div>
+    </div>
+    <script type="module" src="./src/utils/main.js"></script>
+    <script type="module" src="./src/categories.js"></script>
+</body>
+</html>
