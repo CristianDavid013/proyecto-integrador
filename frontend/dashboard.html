@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro de Gastos</title>
+    <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+    <h1>Bienvenido, <span id="username"></span></h1>
+
+    <!-- Formulario para Gastos -->
+    <div>
+        <h2>Registrar Gasto</h2>
+        <form id="expenseForm">
+            <input type="number" id="amount" placeholder="Monto" required>
+            <input type="text" id="description" placeholder="Descripción">
+            <input type="text" id="category" placeholder="Categoría" required>
+            <button type="submit">Guardar Gasto</button>
+        </form>
+    </div>
+
+    <!-- Formulario para Categorías -->
+    <div>
+        <h2>Crear Categoría</h2>
+        <form id="categoryForm">
+            <input type="text" id="categoryName" placeholder="Nombre de categoría" required>
+            <button type="submit">Crear Categoría</button>
+        </form>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

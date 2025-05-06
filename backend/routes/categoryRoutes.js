@@ -5,21 +5,15 @@ const Category = require("../models/Category");
 
 router.post("/", auth, async (req, res) => {
     try {
-        const {name} = req.body;
-        
-        if(!name){
-            return res.status(400).json({error: "El nombre de la categoria es obligatorio"})
-        }
-
+        const { name } = req.body;
         const category = new Category({
             name,
-            user: req.user.id,
+            user: req.user.id // Asocia la categoría al usuario
         });
-
         await category.save();
         res.status(201).json(category);
     } catch (error) {
-        res.status(400).json({error: error.message});
+        res.status(500).json({ error: "Error al crear la categoría" });
     }
 });
 

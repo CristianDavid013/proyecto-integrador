@@ -3,13 +3,17 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const auth = require('../middleware/auth');
 
+const path = require("path");
 
-router.post('/reset-password', authController.resetPassword);
-router.post('/change-password', auth, authController.changePassword);
 router.get('/validate-token/:token', authController.validateResetToken);
+router.get("/login", (req, res) => {
+    res.sendFile(path.join(__dirname, "../views/login.html"));
+});
+
 router.post("/register", authController.register);
 router.post("/login", authController.login);
-
+router.post('/reset-password', auth,   authController.resetPassword);
+router.post('/change-password', auth,   authController.changePassword);
 
 // En authController.js
 exports.validateResetToken = async (req, res) => {

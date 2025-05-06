@@ -6,9 +6,9 @@ const path = require('path');
 require('dotenv').config();
 
 const categoryRoutes = require('./routes/categoryRoutes');
-const expenseRoutes = require('./routes/expenseRoutes');
 const authRoutes = require('./routes/authRoutes');
 const auth = require('./middleware/auth');
+const expenseRoutes = require('./routes/expenseRoutes');
 
 const app = express();
 
@@ -26,9 +26,10 @@ mongoose.connect(process.env.MONGO_URI, {
 .catch((error) => console.error('Error de conexión:', error));
 
 // Rutas API protegidas y públicas
-app.use('/auth', authRoutes);
+app.use('/auth', require('./routes/authRoutes'));
 app.use('/category', auth, categoryRoutes);
 app.use('/expense', auth, expenseRoutes);
+
 
 // Rutas para HTML
 app.get('/', (req, res) => {
