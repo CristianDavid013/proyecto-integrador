@@ -7,9 +7,10 @@ let userEmail = "";
 resetForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
+  // Paso 1: Verificar nombre y correo
   if (step1.style.display !== "none") {
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
 
     try {
       const res = await fetch("/auth/reset-request", {
@@ -18,46 +19,22 @@ resetForm.addEventListener("submit", async (e) => {
         body: JSON.stringify({ name, email }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Verificación fallida");
+        throw new Error(data.error || "Verificación fallida");
       }
 
       userEmail = email;
-      step1.style.display = "none";
-      step2.style.display = "block";
+      localStorage.setItem("resetToken", data.resetToken); // Guarda el token
+
+      // Ir a página de cambio de contraseña
+      window.location.href = "/change-password.html";
     } catch (error) {
       alert("Error: " + error.message);
     }
 
   } else {
-    const newPassword = document.getElementById("newPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
-
-    if (newPassword.length < 6) {
-      return alert("La contraseña debe tener al menos 6 caracteres");
-    }
-
-    if (newPassword !== confirmPassword) {
-      return alert("Las contraseñas no coinciden");
-    }
-
-    try {
-      const res = await fetch("/auth/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: userEmail, newPassword }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Error al cambiar contraseña");
-      }
-
-      alert("Contraseña actualizada. Redirigiendo al inicio de sesión.");
-      window.location.href = "/login";
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
+    // Este bloque ya no es necesario si usas una página aparte para el cambio de contraseña
   }
 });

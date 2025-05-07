@@ -14,6 +14,8 @@ exports.login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ error: "Contraseña inválida" });
 
+        
+
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "24hrs" });
         res.json({ token });
     } catch (error) {
@@ -40,16 +42,17 @@ exports.register = async (req, res) => {
 
 exports.requestPasswordReset = async (req, res) => {
     try {
-        const { email } = req.body;
-        const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ error: "No existe un usuario con este correo" });
+        const { name, email } = req.body;
+
+        const user = await User.findOne({ name, email }); // Asegúrate de buscar por ambos
+        if (!user) return res.status(404).json({ error: "No existe un usuario con este nombre y correo" });
 
         const resetToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
         user.resetPasswordToken = resetToken;
         user.resetPasswordExpires = Date.now() + 3600000;
         await user.save();
 
-        res.json({ message: "Se ha enviado un enlace de recuperación", resetToken, email: user.email });
+        res.json({ message: "Se ha enviado un enlace de recuperación", resetToken });
     } catch (error) {
         res.status(500).json({ error: "Error al procesar la solicitud" });
     }
@@ -58,13 +61,20 @@ exports.requestPasswordReset = async (req, res) => {
 exports.resetPassword = async (req, res) => {
     try {
         const { token, email, newPassword } = req.body;
-        if (!token || !email || !newPassword) return res.status(400).json({ error: "Todos los campos son requeridos" });
+        if (!token || !email || !newPassword) {
+            return res.status(400).json({ error: "Todos los campos son requeridos" });
+        }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findOne({ email });
-        if (!user) return res.status(404).json({ error: "Usuario no encontrado" });
+        const user = await User.findOne({ _id: decoded.id, email });
+
+        if (!user || user.resetPasswordToken !== token || Date.now() > user.resetPasswordExpires) {
+            return res.status(400).json({ error: "Token inválido o expirado" });
+        }
 
         user.password = await bcrypt.hash(newPassword, 10);
+        user.resetPasswordToken = null;
+        user.resetPasswordExpires = null;
         await user.save();
 
         res.json({ message: "Contraseña actualizada correctamente", success: true });
@@ -72,6 +82,7 @@ exports.resetPassword = async (req, res) => {
         res.status(400).json({ error: error.message || "Token inválido o expirado" });
     }
 };
+
 
 exports.changePassword = async (req, res) => {
     try {

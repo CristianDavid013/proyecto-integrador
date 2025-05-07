@@ -1,59 +1,40 @@
-const resetForm = document.getElementById("resetForm");
-const step1 = document.getElementById("step1");
-const step2 = document.getElementById("step2");
+const form = document.getElementById("changePasswordForm");
 
-let userEmail = "";
-
-resetForm.addEventListener("submit", async (e) => {
+form.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  if (step1.style.display !== "none") {
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
+  const newPassword = document.getElementById("newPassword").value.trim();
+  const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
-    try {
-      const res = await fetch("/auth/reset-request", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email }),
-      });
+  if (newPassword.length < 6) {
+    return alert("La contraseña debe tener al menos 6 caracteres.");
+  }
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Verificación fallida");
-      }
+  if (newPassword !== confirmPassword) {
+    return alert("Las contraseñas no coinciden.");
+  }
 
-      userEmail = email;
-      step1.style.display = "none";
-      step2.style.display = "block";
-    } catch (error) {
-      alert("Error: " + error.message);
+  try {
+    const resetToken = localStorage.getItem("resetToken");
+    const userEmail = localStorage.getItem("userEmail"); // Si decides guardar también el email
+
+    const res = await fetch("/auth/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: resetToken, email: userEmail, newPassword }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.error || "Error al cambiar la contraseña");
     }
 
-  } else {
-    const newPassword = document.getElementById("newPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
-
-    if (newPassword !== confirmPassword) {
-      return alert("Las contraseñas no coinciden");
-    }
-
-    try {
-      const res = await fetch("/auth/reset-password", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: userEmail, newPassword }),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Error al cambiar contraseña");
-      }
-
-      alert("Contraseña actualizada. Redirigiendo al inicio de sesión.");
-      window.location.href = "/login";
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
+    alert(data.message || "Contraseña actualizada correctamente.");
+    localStorage.removeItem("resetToken");
+    localStorage.removeItem("userEmail");
+    window.location.href = "/login";
+  } catch (error) {
+    alert("Error: " + error.message);
   }
 });
