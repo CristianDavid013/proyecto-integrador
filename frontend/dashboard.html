@@ -1,32 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Registro de Gastos</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Mi App de Gastos</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-    <h1>Bienvenido, <span id="username"></span></h1>
+<header>
+    <h1>Mi Panel de Gastos</h1>
+    <button id="logout-button">Cerrar Sesión</button>
+</header>
 
-    <!-- Formulario para Gastos -->
-    <div>
-        <h2>Registrar Gasto</h2>
-        <form id="expenseForm">
-            <input type="number" id="amount" placeholder="Monto" required>
-            <input type="text" id="description" placeholder="Descripción">
-            <input type="text" id="category" placeholder="Categoría" required>
-            <button type="submit">Guardar Gasto</button>
-        </form>
-    </div>
+<main class="dashboard">
+    <section class="summary-section">
+        <h2>Resumen Financiero</h2>
+        <div id="summary-cards" class="cards-container"></div>
+    </section>
 
-    <!-- Formulario para Categorías -->
-    <div>
-        <h2>Crear Categoría</h2>
-        <form id="categoryForm">
-            <input type="text" id="categoryName" placeholder="Nombre de categoría" required>
-            <button type="submit">Crear Categoría</button>
-        </form>
-    </div>
+    <section class="recent-expenses">
+        <h2>Gastos Recientes</h2>
+        <div id="recent-expenses"></div>
+    </section>
 
-    <script src="dashboard.js"></script>
+    <section class="category-stats">
+        <h2>Distribución por Categorías</h2>
+        <canvas id="category-chart"></canvas>
+    </section>
+
+    <section id="quick-actions" class="quick-actions"></section>
+</main>
+
+<script type="module" src="frontend/src/auth/dashboard.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </body>
 </html>
